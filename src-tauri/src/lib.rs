@@ -1,6 +1,7 @@
 mod commands;
 mod config;
 mod db;
+mod ssh;
 mod state;
 
 use state::connections::AppState;

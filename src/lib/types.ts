@@ -1,3 +1,15 @@
+export type SshAuth =
+  | { type: "Password"; password: string }
+  | { type: "PrivateKey"; private_key_path: string; passphrase?: string };
+
+export interface SshConfig {
+  enabled: boolean;
+  host: string;
+  port: number;
+  username: string;
+  auth: SshAuth;
+}
+
 export interface SavedConnection {
   id: string;
   name: string;
@@ -7,6 +19,7 @@ export interface SavedConnection {
   username: string;
   password: string;
   ssl_mode: string;
+  ssh?: SshConfig;
 }
 
 export interface TableInfo {

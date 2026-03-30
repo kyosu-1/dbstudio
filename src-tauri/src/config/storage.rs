@@ -3,6 +3,25 @@ use std::fs;
 use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(tag = "type")]
+pub enum SshAuth {
+    Password { password: String },
+    PrivateKey {
+        private_key_path: String,
+        passphrase: Option<String>,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SshConfig {
+    pub enabled: bool,
+    pub host: String,
+    pub port: u16,
+    pub username: String,
+    pub auth: SshAuth,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SavedConnection {
     pub id: String,
     pub name: String,
@@ -13,6 +32,8 @@ pub struct SavedConnection {
     pub password: String,
     #[serde(default = "default_ssl_mode")]
     pub ssl_mode: String,
+    #[serde(default)]
+    pub ssh: Option<SshConfig>,
 }
 
 fn default_ssl_mode() -> String {
@@ -21,9 +42,13 @@ fn default_ssl_mode() -> String {
 
 impl SavedConnection {
     pub fn connection_string(&self) -> String {
+        self.connection_string_with(&self.host, self.port)
+    }
+
+    pub fn connection_string_with(&self, host: &str, port: u16) -> String {
         format!(
             "postgres://{}:{}@{}:{}/{}?sslmode={}",
-            self.username, self.password, self.host, self.port, self.database, self.ssl_mode
+            self.username, self.password, host, port, self.database, self.ssl_mode
         )
     }
 }
