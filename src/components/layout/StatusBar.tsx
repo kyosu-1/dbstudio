@@ -1,0 +1,33 @@
+import { Database } from "lucide-react";
+import { useAppStore } from "../../store/appStore";
+
+export function StatusBar() {
+  const { activeConnectionId, savedConnections, connectionStatus } = useAppStore();
+  const conn = savedConnections.find((c) => c.id === activeConnectionId);
+  const isConnected = activeConnectionId
+    ? connectionStatus[activeConnectionId] === "connected"
+    : false;
+
+  return (
+    <div className="flex items-center px-3 py-1 bg-[var(--bg-secondary)] border-t border-[var(--border)] text-xs text-[var(--text-muted)]">
+      <div className="flex items-center gap-2">
+        <Database size={11} />
+        {conn ? (
+          <span>
+            <span
+              className={isConnected ? "text-[var(--success)]" : "text-[var(--text-muted)]"}
+            >
+              {conn.name || conn.database}
+            </span>
+            <span className="ml-2">
+              {conn.host}:{conn.port}/{conn.database}
+            </span>
+          </span>
+        ) : (
+          <span>No connection</span>
+        )}
+      </div>
+      <div className="ml-auto">PostgreSQL</div>
+    </div>
+  );
+}
