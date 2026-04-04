@@ -33,6 +33,11 @@ pub fn run() {
             commands::data::fetch_rows,
             commands::query::execute_sql,
             commands::query::explain_sql,
+            commands::mutation::get_primary_keys,
+            commands::mutation::update_rows,
+            commands::mutation::insert_rows,
+            commands::mutation::delete_rows,
+            commands::metadata::get_completion_metadata,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
