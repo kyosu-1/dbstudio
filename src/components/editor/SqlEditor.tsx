@@ -2,6 +2,8 @@ import { useState, useCallback } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { sql, PostgreSQL } from "@codemirror/lang-sql";
 import { keymap, EditorView } from "@codemirror/view";
+import { autocompletion } from "@codemirror/autocomplete";
+import { createCompletionSource } from "../../lib/sql-completion";
 import { Play, Zap, Loader2 } from "lucide-react";
 import { useAppStore } from "../../store/appStore";
 import { api } from "../../lib/tauri";
@@ -14,7 +16,7 @@ interface Props {
 }
 
 export function SqlEditor({ tabId, initialSql }: Props) {
-  const { activeConnectionId, updateTab } = useAppStore();
+  const { activeConnectionId, updateTab, completionMetadata } = useAppStore();
   const [sqlText, setSqlText] = useState(initialSql ?? "");
   const [result, setResult] = useState<QueryResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,6 +54,15 @@ export function SqlEditor({ tabId, initialSql }: Props) {
       },
     },
   ]);
+
+  const currentMetadata = activeConnectionId
+    ? completionMetadata[activeConnectionId] ?? null
+    : null;
+
+  const completionExtension = autocompletion({
+    override: [createCompletionSource(currentMetadata)],
+    activateOnTyping: true,
+  });
 
   const theme = EditorView.theme({
     "&": {
@@ -106,7 +117,7 @@ export function SqlEditor({ tabId, initialSql }: Props) {
           value={sqlText}
           height="100%"
           theme="dark"
-          extensions={[sql({ dialect: PostgreSQL }), executeKeymap, theme]}
+          extensions={[sql({ dialect: PostgreSQL }), executeKeymap, completionExtension, theme]}
           onChange={(val) => {
             setSqlText(val);
             updateTab(tabId, { sql: val });

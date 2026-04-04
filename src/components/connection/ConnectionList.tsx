@@ -19,6 +19,7 @@ export function ConnectionList() {
     setShowConnectionDialog,
     setEditingConnection,
     setSavedConnections,
+    setCompletionMetadata,
   } = useAppStore();
 
   const handleConnect = async (id: string) => {
@@ -26,6 +27,9 @@ export function ConnectionList() {
       await api.connect(id);
       setConnectionStatus(id, "connected");
       setActiveConnectionId(id);
+      api.getCompletionMetadata(id).then((metadata) => {
+        setCompletionMetadata(id, metadata);
+      }).catch(console.error);
     } catch (e) {
       alert(`Connection failed: ${e}`);
     }
