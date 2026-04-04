@@ -5,6 +5,9 @@ import type {
   ColumnInfo,
   FetchResult,
   QueryResult,
+  UpdateChange,
+  MutationResult,
+  CompletionMetadata,
 } from "./types";
 
 export const api = {
@@ -48,4 +51,49 @@ export const api = {
 
   explainSql: (connectionId: string, sql: string) =>
     invoke<string>("explain_sql", { connectionId, sql }),
+
+  getPrimaryKeys: (connectionId: string, schema: string, table: string) =>
+    invoke<string[]>("get_primary_keys", { connectionId, schema, table }),
+
+  updateRows: (
+    connectionId: string,
+    schema: string,
+    table: string,
+    changes: UpdateChange[]
+  ) =>
+    invoke<MutationResult>("update_rows", {
+      connectionId,
+      schema,
+      table,
+      changes,
+    }),
+
+  insertRows: (
+    connectionId: string,
+    schema: string,
+    table: string,
+    rows: Record<string, unknown>[]
+  ) =>
+    invoke<MutationResult>("insert_rows", {
+      connectionId,
+      schema,
+      table,
+      rows,
+    }),
+
+  deleteRows: (
+    connectionId: string,
+    schema: string,
+    table: string,
+    pkValues: Record<string, unknown>[]
+  ) =>
+    invoke<MutationResult>("delete_rows", {
+      connectionId,
+      schema,
+      table,
+      pkValues,
+    }),
+
+  getCompletionMetadata: (connectionId: string) =>
+    invoke<CompletionMetadata>("get_completion_metadata", { connectionId }),
 };

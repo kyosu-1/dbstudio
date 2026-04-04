@@ -77,3 +77,49 @@ export interface Tab {
   tableName?: string;
   sql?: string;
 }
+
+// --- Mutation types ---
+
+export interface UpdateChange {
+  pk: Record<string, unknown>;
+  column: string;
+  old_value: unknown;
+  new_value: unknown;
+}
+
+export interface MutationResult {
+  affected: number;
+}
+
+export interface ChangeSet {
+  updates: UpdateChange[];
+  inserts: Record<string, unknown>[];
+  deletes: Record<string, unknown>[];
+}
+
+// --- Completion metadata types ---
+
+export interface TableMeta2 {
+  schema: string;
+  name: string;
+  table_type: string;
+}
+
+export interface ColumnMeta2 {
+  schema: string;
+  table: string;
+  name: string;
+  data_type: string;
+}
+
+export interface FunctionMeta {
+  name: string;
+  description: string;
+}
+
+export interface CompletionMetadata {
+  schemas: string[];
+  tables: TableMeta2[];
+  columns: ColumnMeta2[];
+  functions: FunctionMeta[];
+}

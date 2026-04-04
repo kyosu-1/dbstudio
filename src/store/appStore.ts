@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { SavedConnection, Tab } from "../lib/types";
+import type { SavedConnection, Tab, ChangeSet, CompletionMetadata } from "../lib/types";
 
 interface AppState {
   // Connections
@@ -23,6 +23,19 @@ interface AppState {
   editingConnection: SavedConnection | null;
   setShowConnectionDialog: (show: boolean) => void;
   setEditingConnection: (conn: SavedConnection | null) => void;
+
+  // Editing
+  pendingChanges: Record<string, ChangeSet>;
+  setPendingChanges: (tabId: string, changes: ChangeSet) => void;
+  clearPendingChanges: (tabId: string) => void;
+
+  // Completion
+  completionMetadata: Record<string, CompletionMetadata>;
+  setCompletionMetadata: (connectionId: string, metadata: CompletionMetadata) => void;
+
+  // Command Palette
+  showCommandPalette: boolean;
+  setShowCommandPalette: (show: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -71,4 +84,24 @@ export const useAppStore = create<AppState>((set) => ({
   editingConnection: null,
   setShowConnectionDialog: (show) => set({ showConnectionDialog: show }),
   setEditingConnection: (conn) => set({ editingConnection: conn }),
+
+  pendingChanges: {},
+  setPendingChanges: (tabId, changes) =>
+    set((state) => ({
+      pendingChanges: { ...state.pendingChanges, [tabId]: changes },
+    })),
+  clearPendingChanges: (tabId) =>
+    set((state) => {
+      const { [tabId]: _, ...rest } = state.pendingChanges;
+      return { pendingChanges: rest };
+    }),
+
+  completionMetadata: {},
+  setCompletionMetadata: (connectionId, metadata) =>
+    set((state) => ({
+      completionMetadata: { ...state.completionMetadata, [connectionId]: metadata },
+    })),
+
+  showCommandPalette: false,
+  setShowCommandPalette: (show) => set({ showCommandPalette: show }),
 }));
