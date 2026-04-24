@@ -1,8 +1,8 @@
-import { Database } from "lucide-react";
+import { Database, FlaskConical } from "lucide-react";
 import { useAppStore } from "../../store/appStore";
 
 export function StatusBar() {
-  const { activeConnectionId, savedConnections, connectionStatus } = useAppStore();
+  const { activeConnectionId, savedConnections, connectionStatus, isDemoMode } = useAppStore();
   const conn = savedConnections.find((c) => c.id === activeConnectionId);
   const isConnected = activeConnectionId
     ? connectionStatus[activeConnectionId] === "connected"
@@ -11,7 +11,11 @@ export function StatusBar() {
   return (
     <div className="flex items-center px-3 py-1 bg-[var(--bg-secondary)] border-t border-[var(--border)] text-xs text-[var(--text-muted)]">
       <div className="flex items-center gap-2">
-        <Database size={11} />
+        {isDemoMode ? (
+          <FlaskConical size={11} className="text-[var(--accent)]" />
+        ) : (
+          <Database size={11} />
+        )}
         {conn ? (
           <span>
             <span
@@ -27,7 +31,13 @@ export function StatusBar() {
           <span>No connection</span>
         )}
       </div>
-      <div className="ml-auto">PostgreSQL</div>
+      <div className="ml-auto">
+        {isDemoMode ? (
+          <span className="text-[var(--accent)]">Demo Mode</span>
+        ) : (
+          "PostgreSQL"
+        )}
+      </div>
     </div>
   );
 }

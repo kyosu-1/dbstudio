@@ -9,8 +9,11 @@ import type {
   MutationResult,
   CompletionMetadata,
 } from "./types";
+import { demoApi } from "./demo-api";
 
-export const api = {
+type Api = typeof realApi;
+
+const realApi = {
   listSavedConnections: () =>
     invoke<SavedConnection[]>("list_saved_connections"),
 
@@ -97,3 +100,23 @@ export const api = {
   getCompletionMetadata: (connectionId: string) =>
     invoke<CompletionMetadata>("get_completion_metadata", { connectionId }),
 };
+
+let _isDemoMode = false;
+
+export function setDemoMode(enabled: boolean) {
+  _isDemoMode = enabled;
+}
+
+export function isDemoMode(): boolean {
+  return _isDemoMode;
+}
+
+// Proxy that delegates to the correct backend
+export const api: Api = new Proxy(realApi, {
+  get(_target, prop: string) {
+    if (_isDemoMode) {
+      return (demoApi as Record<string, unknown>)[prop];
+    }
+    return (realApi as Record<string, unknown>)[prop];
+  },
+});

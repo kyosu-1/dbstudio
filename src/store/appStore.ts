@@ -2,6 +2,10 @@ import { create } from "zustand";
 import type { SavedConnection, Tab, ChangeSet, CompletionMetadata } from "../lib/types";
 
 interface AppState {
+  // Demo mode
+  isDemoMode: boolean;
+  setDemoMode: (enabled: boolean) => void;
+
   // Connections
   savedConnections: SavedConnection[];
   activeConnectionId: string | null;
@@ -39,6 +43,9 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
+  isDemoMode: false,
+  setDemoMode: (enabled) => set({ isDemoMode: enabled }),
+
   savedConnections: [],
   activeConnectionId: null,
   connectionStatus: {},
